@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nova — Smarter Shopping</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+:root{
+  --bg:#F7F6F3;--surface:#FFFFFF;--s2:#F0EEE9;
+  --border:#E5E2DA;--bmd:#CCC9C0;
+  --ink:#1A1916;--ink2:#5C5A55;--ink3:#9B988F;
+  --accent:#2563EB;--abg:#EEF4FF;--aborder:#BFCFEF;
+  --green:#16A34A;--gbg:#F0FDF4;--gborder:#BBF7D0;
+  --amber:#B45309;--ambg:#FFFBEB;--amborder:#FDE68A;
+  --red:#DC2626;--rbg:#FEF2F2;
+  --r:10px;--rsm:7px;--rpill:999px;
+  --sha:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --shb:0 4px 16px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.04);
+  --f:'Inter',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh}
+.app{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);display:flex;flex-direction:column}
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;flex-shrink:0}
+.logo{font-size:21px;font-weight:700;letter-spacing:-1px}.logo em{color:var(--accent);font-style:normal}
+.tag{font-size:9.5px;color:var(--ink3);margin-top:1px;letter-spacing:.2px}
+.nav-icons{display:flex;gap:2px}
+.nb{background:none;border:none;cursor:pointer;color:var(--ink2);padding:7px;border-radius:var(--rsm);font-size:19px;transition:color .15s,background .15s;position:relative}
+.nb:hover{color:var(--ink);background:var(--s2)}
+.cb::after{content:'3';position:absolute;top:4px;right:4px;background:var(--accent);color:#fff;font-size:8px;font-weight:700;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--surface)}
+/* PAGES */
+.page{display:none;flex-direction:column;flex:1;overflow:hidden}.page.active{display:flex}
+/* SEARCH */
+.sw{padding:11px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.sb{display:flex;align-items:center;gap:9px;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:10px 14px;transition:border-color .2s,box-shadow .2s}
+.sb:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.sb i{color:var(--ink3);font-size:17px;flex-shrink:0}
+.sb input{flex:1;border:none;background:none;color:var(--ink);font-size:14px;font-family:var(--f);outline:none}
+.sb input::placeholder{color:var(--ink3)}
+/* PILLS */
+.cs{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;scrollbar-width:none;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.cs::-webkit-scrollbar{display:none}
+.cp{flex-shrink:0;padding:6px 13px;border-radius:var(--rpill);border:1.5px solid var(--border);font-size:12px;font-weight:500;color:var(--ink2);background:var(--surface);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap;user-select:none}
+.cp i{font-size:13px;font-family:'tabler-icons' !important;font-style:normal}.cp-ico{font-size:13px;line-height:1}
+.cp.active{background:var(--accent);color:#fff;border-color:var(--accent)}.cp.active i,.cp.active i::before{color:#fff !important}
+.cp:hover:not(.active){background:var(--bg);border-color:var(--bmd);color:var(--ink)}
+/* HOME BODY */
+.hb{overflow-y:auto;flex:1;padding-bottom:80px}
+/* BANNER */
+.banner{margin:14px 16px 0;background:linear-gradient(135deg,#EEF4FF,#F0FDF4);border:1px solid var(--aborder);border-radius:var(--r);padding:13px 15px;display:flex;gap:11px;align-items:flex-start}
+.banner>i{color:var(--accent);font-size:18px;flex-shrink:0;margin-top:1px}
+.banner-t{font-size:12.5px;color:#1e3a5f;line-height:1.55}
+.banner-t strong{color:var(--accent)}
+/* SECTION */
+.shd{display:flex;justify-content:space-between;align-items:center;padding:18px 16px 10px}
+.st{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.2px}
+.sl{font-size:12.5px;color:var(--accent);cursor:pointer;font-weight:500}
+.sl:hover{text-decoration:underline}
+/* GRID */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px}
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s}
+.pc:hover{transform:translateY(-2px);box-shadow:var(--shb);border-color:var(--bmd)}
+.pc:active{transform:translateY(0)}
+.pi{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:52px;background:var(--s2)}
+.pb{padding:10px 11px 12px}
+.ps{font-size:11px;color:var(--ink3);margin-bottom:3px;display:flex;align-items:center;gap:5px;font-weight:500}
+.td{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.pn{font-size:12.5px;font-weight:500;color:var(--ink);margin-bottom:5px;line-height:1.35}
+.pp{display:flex;align-items:baseline;gap:5px;margin-bottom:4px}
+.pr{font-size:15px;font-weight:700;color:var(--ink)}
+.po{font-size:11px;color:var(--ink3);text-decoration:line-through}
+.prat{display:flex;align-items:center;gap:4px;margin-bottom:5px}
+.stars{color:#D97706;font-size:11px;letter-spacing:-.5px}
+.rc{font-size:11px;color:var(--ink3)}
+.ws{font-size:10px;color:var(--accent);display:flex;align-items:center;gap:3px;font-weight:500}
+/* TRENDING */
+.tl{padding:0 16px;display:flex;flex-direction:column;gap:8px}
+.ti{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:11px 14px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.ti:hover{border-color:var(--bmd);box-shadow:var(--sha)}
+.tn{font-size:12px;font-weight:700;color:var(--ink3);width:16px;flex-shrink:0}
+.te{font-size:22px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;background:var(--s2);border-radius:var(--rsm);flex-shrink:0}
+.ti-info{flex:1;min-width:0}
+.ti-name{font-size:13px;font-weight:500;color:var(--ink)}
+.ti-meta{font-size:11px;color:var(--ink3);margin-top:2px;display:flex;align-items:center;gap:5px}
+.tb{font-size:10px;font-weight:700;background:var(--gbg);color:var(--green);padding:2px 6px;border-radius:4px}
+.tprice{font-size:14px;font-weight:700;color:var(--ink)}
+/* TRUST BAR */
+.trust-bar{margin:20px 16px 0;border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;background:var(--surface);display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.trs{display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center}
+.trs i{font-size:18px;color:var(--accent)}
+.trs-l{font-size:10px;color:var(--ink2);font-weight:600;line-height:1.3}
+
+/* PRODUCT DETAIL */
+.hero{background:var(--s2);aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:100px;position:relative;flex-shrink:0}
+.bk{background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:7px 12px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--ink2);font-family:var(--f);transition:all .15s;box-shadow:var(--sha)}
+.bk:hover{color:var(--ink);border-color:var(--bmd)}
+.bk-abs{position:absolute;top:14px;left:14px;z-index:10}
+.ddb{padding:18px 18px 100px;overflow-y:auto;flex:1}
+.str{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.tscore{font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--rpill);display:inline-flex;align-items:center;gap:4px;background:var(--gbg);color:var(--green);border:1px solid var(--gborder)}
+.sname{font-size:12px;color:var(--ink3)}
+.dname{font-size:20px;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:10px;letter-spacing:-.4px}
+.drat{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.prow{display:flex;align-items:baseline;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.big{font-size:28px;font-weight:700;letter-spacing:-.5px}
+.was{font-size:15px;color:var(--ink3);text-decoration:line-through}
+.pnote{font-size:11px;font-weight:600;background:var(--gbg);color:var(--green);border:1px solid var(--gborder);padding:3px 9px;border-radius:var(--rpill)}
+.rbox{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:14px}
+.rbox-t{font-size:11px;font-weight:700;color:var(--ink2);margin-bottom:10px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px}
+.rbox-t i{color:var(--accent)}
+.rdesc{font-size:12.5px;color:var(--ink2);margin-bottom:12px;line-height:1.6}
+.pcg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pct{font-size:11px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:5px;text-transform:uppercase;letter-spacing:.5px}
+.pct.pro{color:var(--green)}.pct.con{color:var(--red)}
+.pci{font-size:12px;color:var(--ink2);margin-bottom:5px;display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+.pci i{font-size:11px;flex-shrink:0;margin-top:2px}
+.pci.pro i{color:var(--green)}.pci.con i{color:var(--red)}
+.phw{margin-bottom:14px}
+.pht{font-size:11px;font-weight:700;color:var(--ink2);margin-bottom:10px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px}
+.pht i{color:var(--accent)}
+.phb{display:flex;align-items:flex-end;gap:4px;height:56px;background:var(--s2);border:1px solid var(--border);border-radius:var(--rsm);padding:10px 12px 0}
+.phcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.phbar{width:100%;background:var(--bmd);border-radius:3px 3px 0 0}
+.phbar.now{background:var(--accent)}
+.phmo{font-size:9px;color:var(--ink3);padding:4px 0;font-weight:500}
+.phn{font-size:11px;color:var(--ink3);margin-top:8px;padding:0 2px}
+/* CTA */
+.cta{padding:12px 18px;border-top:1px solid var(--border);background:rgba(255,255,255,.97);backdrop-filter:blur(12px);display:flex;gap:10px;position:sticky;bottom:60px;z-index:50;flex-shrink:0}
+/* BUTTONS */
+.btn{flex:1;background:var(--ink);color:#fff;border:none;border-radius:var(--r);padding:13px 20px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--f);transition:background .15s,transform .1s,box-shadow .15s;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.btn:hover{background:#2d2b27;box-shadow:0 4px 16px rgba(0,0,0,.25)}.btn:active{transform:scale(.98)}
+.btn.blue{background:var(--accent);box-shadow:0 2px 8px rgba(37,99,235,.3)}.btn.blue:hover{background:#1d4ed8}
+.btn2{background:var(--surface);color:var(--ink);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 16px;font-size:14px;font-weight:500;cursor:pointer;font-family:var(--f);display:flex;align-items:center;gap:6px;transition:all .15s}
+.btn2:hover{background:var(--s2);border-color:var(--bmd)}
+.btng{background:none;color:var(--ink2);border:1.5px solid var(--border);border-radius:var(--r);padding:12px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--f);display:flex;align-items:center;gap:6px;transition:all .15s;width:100%;justify-content:center}
+.btng:hover{border-color:var(--accent);color:var(--accent);background:var(--abg)}
+/* CHECKOUT */
+.ckb{padding:18px;overflow-y:auto;flex:1;padding-bottom:30px}
+.ckt{font-size:19px;font-weight:700;letter-spacing:-.4px;margin-bottom:20px}
+.ckl{font-size:10.5px;font-weight:700;color:var(--ink3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.ckf{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rsm);padding:12px 14px;margin-bottom:8px;font-size:14px;color:var(--ink);font-family:var(--f);width:100%;display:flex;justify-content:space-between;align-items:center;transition:border-color .2s,box-shadow .2s}
+.ckf:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.ckf i{color:var(--ink3);font-size:16px}
+.ckf input{border:none;background:none;color:var(--ink);font-size:14px;font-family:var(--f);outline:none;width:100%}
+.ckrow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.payopts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.popt{border:1.5px solid var(--border);border-radius:var(--rsm);padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s;font-size:12px;font-weight:500;color:var(--ink2);font-family:var(--f);background:var(--surface)}
+.popt i{font-size:22px;display:block;margin-bottom:5px}
+.popt.sel{border-color:var(--accent);background:var(--abg);color:var(--accent)}
+.obox{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:14px}
+.orow{display:flex;justify-content:space-between;font-size:13px;color:var(--ink2);margin-bottom:9px}
+.orow.tot{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:0;padding-top:10px;border-top:1px solid var(--border)}
+.snote{font-size:12px;color:var(--green);display:flex;align-items:center;gap:6px;font-weight:500;margin-bottom:12px;background:var(--gbg);border:1px solid var(--gborder);border-radius:var(--rsm);padding:9px 12px}
+.rwarn{background:var(--ambg);border:1px solid var(--amborder);border-radius:var(--rsm);padding:10px 13px;font-size:12.5px;color:var(--amber);display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;line-height:1.5}
+.secnote{font-size:11px;color:var(--ink3);text-align:center;margin-top:12px;line-height:1.6;display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap}
+.secnote a{color:var(--accent);cursor:pointer}
+/* SELLER */
+.selb{padding:18px;overflow-y:auto;flex:1;padding-bottom:80px}
+.selhd{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
+.selav{width:52px;height:52px;border-radius:12px;background:var(--abg);border:1px solid var(--aborder);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.selme h2{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.selme p{font-size:12px;color:var(--ink3);margin-top:3px}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:12px;text-align:center}
+.sn{font-size:19px;font-weight:700;color:var(--ink);letter-spacing:-.5px}
+.sl2{font-size:10.5px;color:var(--ink3);margin-top:3px;font-weight:500}
+.clbl{font-size:13px;font-weight:600;margin-bottom:10px;color:var(--ink)}
+.mch{height:64px;display:flex;align-items:flex-end;gap:5px;margin-bottom:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);padding:12px 12px 0}
+.mb{flex:1;background:var(--border);border-radius:3px 3px 0 0;transition:background .15s;cursor:pointer}
+.mb:hover{background:rgba(37,99,235,.4)}.mb.hi{background:var(--accent)}
+.ait{background:var(--abg);border:1px solid var(--aborder);border-radius:var(--r);padding:13px 15px;display:flex;gap:11px;margin-bottom:10px}
+.ait>i{color:var(--accent);font-size:17px;flex-shrink:0;margin-top:1px}
+.att{font-size:11px;font-weight:700;color:#1e40af;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.ait p{font-size:12.5px;color:#1e40af;line-height:1.55}
+.ait.g{background:var(--gbg);border-color:var(--gborder)}
+.ait.g>i,.ait.g .att,.ait.g p{color:#166534}
+/* ASSISTANT */
+.asi{display:flex;flex-direction:column;flex:1;overflow:hidden}
+.ash{padding:16px 18px 12px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface)}
+.ash h2{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.ash p{font-size:12px;color:var(--ink3);margin-top:3px}
+.cm{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:16px 16px 10px;background:var(--bg)}
+.bub{max-width:87%;padding:11px 14px;border-radius:14px;font-size:13.5px;line-height:1.55}
+.bub.b{background:var(--surface);border:1px solid var(--border);color:var(--ink);align-self:flex-start;border-radius:4px 14px 14px 14px;box-shadow:var(--sha)}
+.bub.m{background:var(--ink);color:#fff;align-self:flex-end;border-radius:14px 4px 14px 14px}
+.qrw{display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 10px;flex-shrink:0;background:var(--bg)}
+.qr{font-size:12px;font-weight:500;border:1.5px solid var(--border);background:var(--surface);color:var(--ink2);border-radius:var(--rpill);padding:6px 13px;cursor:pointer;transition:all .15s;font-family:var(--f);user-select:none}
+.qr:hover{border-color:var(--accent);color:var(--accent);background:var(--abg)}
+.cir{display:flex;gap:8px;align-items:flex-end;padding:12px 16px 14px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.ci{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:10px 14px;font-size:14px;color:var(--ink);font-family:var(--f);resize:none;min-height:42px;max-height:100px;outline:none;transition:border-color .2s}
+.ci:focus{border-color:var(--accent)}.ci::placeholder{color:var(--ink3)}
+.sendb{background:var(--ink);border:none;border-radius:var(--rsm);width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:17px;flex-shrink:0;transition:background .15s,transform .1s}
+.sendb:hover{background:#2d2b27}.sendb:active{transform:scale(.93)}
+/* COMPARE */
+.cpb{padding:18px;overflow-y:auto;flex:1;padding-bottom:20px}
+.cpmg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.cpc{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:14px}
+.cpc.win{border-color:var(--accent);background:var(--abg)}
+.cpe{font-size:34px;text-align:center;margin-bottom:10px}
+.cpn{font-size:13px;font-weight:600;margin-bottom:4px;line-height:1.3}
+.cpp{font-size:16px;font-weight:700;margin-bottom:10px;letter-spacing:-.3px}
+.cpa{font-size:11px;color:var(--ink2);display:flex;justify-content:space-between;margin-bottom:5px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.cpa:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.cpa span:last-child{font-weight:600;color:var(--ink)}
+.wb{font-size:10px;font-weight:700;background:var(--accent);color:#fff;padding:3px 9px;border-radius:var(--rpill);display:inline-flex;align-items:center;gap:4px;margin-bottom:8px}
+.vsd{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--ink3);margin-bottom:12px;gap:10px}
+.vsd::before,.vsd::after{content:'';height:1px;background:var(--border);flex:1}
+.ainote{margin:0 0 16px;background:var(--abg);border:1px solid var(--aborder);border-radius:var(--r);padding:12px 14px;display:flex;gap:10px;align-items:flex-start}
+.ainote>i{color:var(--accent);font-size:16px;flex-shrink:0;margin-top:1px}
+.ainote-t{font-size:12.5px;color:#1e40af;line-height:1.55}
+/* CONFIRM */
+.conb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;background:var(--bg)}
+.coni{width:72px;height:72px;border-radius:50%;background:var(--gbg);border:2px solid var(--gborder);display:flex;align-items:center;justify-content:center;font-size:34px;margin-bottom:20px}
+.cont{font-size:22px;font-weight:700;letter-spacing:-.5px;margin-bottom:8px}
+.cons{font-size:14px;color:var(--ink2);line-height:1.6;margin-bottom:24px}
+.trkb{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:24px;text-align:left;width:100%;box-shadow:var(--sha)}
+.trkid{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.trkr{display:flex;justify-content:space-between;font-size:13px;color:var(--ink2);margin-bottom:8px}
+.trkr:last-child{margin-bottom:0}
+.tdone{color:var(--green);font-weight:600}.tmuted{color:var(--ink3)}
+/* PROFILE */
+.prfb{padding:18px;overflow-y:auto;flex:1;padding-bottom:80px}
+.prft{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:16px}
+.prfav{width:64px;height:64px;border-radius:50%;background:var(--abg);border:2px solid var(--aborder);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 12px}
+.prfn{font-size:18px;font-weight:700;letter-spacing:-.3px;margin-bottom:4px}
+.prfe{font-size:13px;color:var(--ink3)}
+.prfm{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.pmi{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.pmi:hover{background:var(--s2)}.pmi:last-child{border-bottom:none}
+.pmico{width:34px;height:34px;border-radius:var(--rsm);background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--ink2);flex-shrink:0}
+.pml{flex:1;font-size:14px;font-weight:500}
+.pmc{color:var(--ink3);font-size:17px}
+/* SEARCH PAGE */
+.spb{padding:18px;overflow-y:auto;flex:1}
+.sugg{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rsm);cursor:pointer;transition:all .15s;font-size:14px;color:var(--ink2);font-family:var(--f);margin-bottom:6px}
+.sugg:hover{border-color:var(--bmd);color:var(--ink);box-shadow:var(--sha)}
+.sugg i{color:var(--ink3);font-size:16px}
+/* BOTTOM NAV */
+.bnav{display:flex;border-top:1px solid var(--border);background:rgba(255,255,255,.97);backdrop-filter:blur(12px);position:sticky;bottom:0;z-index:100;flex-shrink:0}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 12px;cursor:pointer;color:var(--ink3);font-size:10px;font-weight:500;font-family:var(--f);gap:3px;transition:color .15s;border:none;background:none}
+.bni i{font-size:20px;transition:transform .15s}
+.bni.active{color:var(--accent)}.bni.active i{transform:scale(1.1)}
+.bni:hover:not(.active){color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="app">
+
+<nav class="nav">
+  <div><div class="logo">nova<em>.</em></div><div class="tag">Smarter shopping, zero clutter</div></div>
+  <div class="nav-icons">
+    <button class="nb" aria-label="Notifications"><i class="ti ti-bell"></i></button>
+    <button class="nb cb" aria-label="Cart" onclick="goCheckout()"><i class="ti ti-shopping-cart"></i></button>
+    <button class="nb" aria-label="Profile" onclick="go('profile','profile')"><i class="ti ti-user-circle"></i></button>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div class="sw"><div class="sb"><i class="ti ti-search"></i><input id="homeSearch" type="text" placeholder="Search products, brands, categories…"/></div></div>
+  <div class="cs">
+    <div class="cp active" data-cat="for-you"><span class="cp-ico">✦</span>For you</div>
+    <div class="cp" data-cat="electronics"><span class="cp-ico">💻</span>Electronics</div>
+    <div class="cp" data-cat="fashion"><span class="cp-ico">👕</span>Fashion</div>
+    <div class="cp" data-cat="home"><span class="cp-ico">🏠</span>Home</div>
+    <div class="cp" data-cat="beauty"><span class="cp-ico">💄</span>Beauty</div>
+    <div class="cp" data-cat="books"><span class="cp-ico">📚</span>Books</div>
+    <div class="cp" data-cat="fitness"><span class="cp-ico">🏃</span>Fitness</div>
+  </div>
+  <div class="hb">
+    <div class="banner"><i class="ti ti-user-check"></i><div class="banner-t" id="bannerT">Based on your gym &amp; audio interests — <strong>Sony WH-1000XM5</strong> and <strong>Garmin Forerunner 265</strong> are trending near Kyle, TX. Zero paid placements.</div></div>
+    <div class="shd"><span class="st" id="sectionTitle">For you</span><span class="sl" onclick="goCompare()">Compare picks →</span></div>
+    <div class="grid" id="productGrid"></div>
+    <div class="shd" style="padding-top:22px"><span class="st">Trending near you</span><span class="sl">See all →</span></div>
+    <div class="tl" id="trendingList"></div>
+    <div class="trust-bar">
+      <div class="trs"><i class="ti ti-shield-check"></i><span class="trs-l">Verified Sellers Only</span></div>
+      <div class="trs"><i class="ti ti-truck"></i><span class="trs-l">Free 2-Day Delivery</span></div>
+      <div class="trs"><i class="ti ti-rotate"></i><span class="trs-l">30-Day Returns</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL -->
+<div id="page-product" class="page">
+  <div style="position:relative;flex-shrink:0">
+    <div class="hero" id="detailHero">
+      <button class="bk bk-abs" onclick="goHome()"><i class="ti ti-arrow-left"></i>Back</button>
+    </div>
+  </div>
+  <div class="ddb">
+    <div class="str">
+      <span class="tscore" id="dTrust"></span>
+      <span class="sname" id="dSeller"></span>
+    </div>
+    <div class="dname" id="dName"></div>
+    <div class="drat">
+      <span class="stars" style="font-size:15px" id="dStars"></span>
+      <span style="font-size:13px;color:var(--ink2)" id="dRating"></span>
+      <span style="font-size:12.5px;color:var(--accent);cursor:pointer;font-weight:500">See all →</span>
+    </div>
+    <div class="prow">
+      <span class="big" id="dPrice"></span>
+      <span class="was" id="dOrig"></span>
+      <span class="pnote" id="dDiscount"></span>
+    </div>
+    <div class="rbox">
+      <div class="rbox-t"><i class="ti ti-robot"></i>AI review summary</div>
+      <div class="rdesc" id="dDesc"></div>
+      <div class="pcg">
+        <div><div class="pct pro"><i class="ti ti-thumb-up"></i>Praised for</div><div id="dPros"></div></div>
+        <div><div class="pct con"><i class="ti ti-thumb-down"></i>Criticism</div><div id="dCons"></div></div>
+      </div>
+    </div>
+    <div class="phw">
+      <div class="pht"><i class="ti ti-chart-line"></i>Price history — last 6 months</div>
+      <div class="phb" id="dChart"></div>
+      <div class="phn" id="dChartNote"></div>
+    </div>
+    <button class="btng" onclick="goCompare()"><i class="ti ti-arrows-left-right"></i>Compare with similar products</button>
+  </div>
+  <div class="cta">
+    <button class="btn2" onclick="goCheckout()" aria-label="Add to cart"><i class="ti ti-shopping-cart-plus"></i></button>
+    <button class="btn" id="dBuyBtn" onclick="goCheckout()">Buy now</button>
+  </div>
+</div>
+
+<!-- CHECKOUT -->
+<div id="page-checkout" class="page">
+  <div class="ckb">
+    <button class="bk" style="margin-bottom:18px" onclick="goProduct()"><i class="ti ti-arrow-left"></i>Back</button>
+    <div class="ckt">Checkout</div>
+    <div class="ckl">Deliver to</div>
+    <div class="ckf"><span>123 Main St, Kyle, TX 78640</span><i class="ti ti-edit"></i></div>
+    <div class="ckl" style="margin-top:16px">Payment</div>
+    <div class="payopts">
+      <div class="popt sel" id="pay-card" onclick="selPay('card')"><i class="ti ti-credit-card"></i>Card</div>
+      <div class="popt" id="pay-wallet" onclick="selPay('wallet')"><i class="ti ti-wallet"></i>Wallet</div>
+      <div class="popt" id="pay-bnpl" onclick="selPay('bnpl')"><i class="ti ti-calendar-dollar"></i>Pay later</div>
+    </div>
+    <div class="ckf"><input type="text" placeholder="Card number"/></div>
+    <div class="ckrow">
+      <div class="ckf"><input type="text" placeholder="MM / YY"/></div>
+      <div class="ckf"><input type="text" placeholder="CVV"/></div>
+    </div>
+    <div class="snote"><i class="ti ti-truck"></i>Free 2-day delivery · arrives Thu Jun 27</div>
+    <div class="rwarn"><i class="ti ti-alert-triangle" style="flex-shrink:0;margin-top:1px"></i><div id="ckWarn"></div></div>
+    <div class="obox">
+      <div class="orow"><span id="ckItemN"></span><span id="ckItemP"></span></div>
+      <div class="orow"><span>Shipping</span><span style="color:var(--green)">Free</span></div>
+      <div class="orow"><span>Tax (8.25%)</span><span id="ckTax"></span></div>
+      <div class="orow tot"><span>Total</span><span id="ckTotal"></span></div>
+    </div>
+    <button class="btn blue" style="width:100%" onclick="goConfirm()" id="ckBtn">Place order</button>
+    <div class="secnote"><i class="ti ti-lock"></i>SSL encrypted · No hidden fees · Free 30-day returns · <a>View policy</a></div>
+  </div>
+</div>
+
+<!-- SELLER -->
+<div id="page-seller" class="page">
+  <div class="selb">
+    <div class="selhd"><div class="selav">🏪</div><div class="selme"><h2>SoundGear Pro</h2><p>Member since 2021 · Trust score 9.4/10</p></div></div>
+    <div class="sg">
+      <div class="sc"><div class="sn">$24.2k</div><div class="sl2">Revenue (30d)</div></div>
+      <div class="sc"><div class="sn">342</div><div class="sl2">Orders</div></div>
+      <div class="sc"><div class="sn">2.1%</div><div class="sl2">Return rate</div></div>
+    </div>
+    <div class="clbl">Revenue — last 7 days</div>
+    <div class="mch">
+      <div class="mb" style="height:30%"></div><div class="mb" style="height:55%"></div>
+      <div class="mb" style="height:45%"></div><div class="mb" style="height:70%"></div>
+      <div class="mb" style="height:60%"></div><div class="mb hi" style="height:90%"></div>
+      <div class="mb" style="height:75%"></div>
+    </div>
+    <div class="ait"><i class="ti ti-bulb"></i><div><div class="att">AI pricing insight</div><p>Competitors dropped to $259 this week. Consider matching to recover 15% lost traffic. Your trust score keeps customers loyal at a $10 premium.</p></div></div>
+    <div class="ait g"><i class="ti ti-trending-up"></i><div><div class="att">Bundle opportunity</div><p>67% of buyers also search for carrying cases. Bundling could increase average order value by $22.</p></div></div>
+    <button class="btn blue" style="width:100%;margin-top:4px"><i class="ti ti-plus" style="margin-right:6px"></i>Add product listing</button>
+  </div>
+</div>
+
+<!-- ASSISTANT -->
+<div id="page-assistant" class="page">
+  <div class="asi">
+    <div class="ash"><h2>Shopping assistant</h2><p>Ask anything in plain English — I explain every recommendation.</p></div>
+    <div class="cm" id="chatMsgs">
+      <div class="bub b">Hey! I'm your Nova assistant. Ask me anything — like "best waterproof speaker under $80 for beach trips." I explain every recommendation I make.</div>
+      <div class="bub m">Best headphones under $100 for gym workouts</div>
+      <div class="bub b">For gym use you want sweat resistance and a secure fit. My top 3 under $100:<br><br><strong>1. Jabra Elite 4 Active ($79)</strong> — IP57 rated, great ANC, secure wingtips. Best overall.<br><strong>2. Beats Fit Pro ($99)</strong> — Apple ecosystem, powerful bass.<br><strong>3. Anker Soundcore Q30 ($55)</strong> — Budget pick, 40h battery.<br><br>Want a side-by-side comparison?</div>
+    </div>
+    <div class="qrw">
+      <div class="qr" onclick="addMsg('Compare them side by side')">Compare side by side</div>
+      <div class="qr" onclick="addMsg('What about Bose options?')">What about Bose?</div>
+      <div class="qr" onclick="addMsg('Show me options under $50')">Under $50</div>
+    </div>
+    <div class="cir">
+      <textarea class="ci" placeholder="Ask anything…" id="chatInput" rows="1"></textarea>
+      <button class="sendb" onclick="sendChat()" aria-label="Send"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARE -->
+<div id="page-compare" class="page">
+  <div class="cpb" id="compareBody">
+    <!-- dynamically rendered -->
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div id="page-confirm" class="page">
+  <div class="conb">
+    <div class="coni">✅</div>
+    <div class="cont">Order placed!</div>
+    <div class="cons" id="conSub">Loading…</div>
+    <div class="trkb">
+      <div class="trkid" id="conNum"></div>
+      <div class="trkr"><span>Processing</span><span class="tdone"><i class="ti ti-check" style="font-size:12px"></i> Done</span></div>
+      <div class="trkr"><span>Shipped</span><span class="tmuted">Tomorrow</span></div>
+      <div class="trkr"><span>Delivered</span><span class="tmuted">Jun 27</span></div>
+    </div>
+    <button class="btn" style="width:100%" onclick="goHome()">Continue shopping</button>
+  </div>
+</div>
+
+<!-- PROFILE -->
+<div id="page-profile" class="page">
+  <div class="prfb">
+    <div class="prft"><div class="prfav">👤</div><div class="prfn">Alex Johnson</div><div class="prfe">alex@email.com · Kyle, TX</div></div>
+    <div class="prfm">
+      <div class="pmi"><div class="pmico"><i class="ti ti-package"></i></div><div class="pml">Orders</div><i class="ti ti-chevron-right pmc"></i></div>
+      <div class="pmi"><div class="pmico"><i class="ti ti-heart"></i></div><div class="pml">Saved items</div><i class="ti ti-chevron-right pmc"></i></div>
+      <div class="pmi"><div class="pmico"><i class="ti ti-star"></i></div><div class="pml">Nova Rewards</div><i class="ti ti-chevron-right pmc"></i></div>
+      <div class="pmi"><div class="pmico"><i class="ti ti-shield"></i></div><div class="pml">Privacy &amp; security</div><i class="ti ti-chevron-right pmc"></i></div>
+      <div class="pmi"><div class="pmico"><i class="ti ti-settings"></i></div><div class="pml">Settings</div><i class="ti ti-chevron-right pmc"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- SEARCH PAGE -->
+<div id="page-search" class="page">
+  <div class="sw"><div class="sb"><i class="ti ti-search"></i><input id="searchIn" type="text" placeholder="Search products, brands, categories…"/></div></div>
+  <div class="spb">
+    <div style="font-size:10.5px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Recent searches</div>
+    <div class="sugg" onclick="filterAndGo('electronics')"><i class="ti ti-history"></i>iPad Air M2</div>
+    <div class="sugg" onclick="filterAndGo('fitness')"><i class="ti ti-history"></i>Garmin running watch</div>
+    <div class="sugg" onclick="filterAndGo('electronics')"><i class="ti ti-trending-up"></i>Sony WH-1000XM5 review</div>
+    <div class="sugg" onclick="filterAndGo('fashion')"><i class="ti ti-trending-up"></i>Nike Pegasus 41</div>
+    <div class="sugg" onclick="filterAndGo('beauty')"><i class="ti ti-trending-up"></i>CeraVe moisturizer</div>
+  </div>
+</div>
+
+<nav class="bnav">
+  <button class="bni active" id="bn-home" onclick="goHome()"><i class="ti ti-home"></i>Home</button>
+  <button class="bni" id="bn-search" onclick="go('search','search')"><i class="ti ti-search"></i>Search</button>
+  <button class="bni" id="bn-assistant" onclick="go('assistant','assistant')"><i class="ti ti-message-circle"></i>Assistant</button>
+  <button class="bni" id="bn-seller" onclick="go('seller','seller')"><i class="ti ti-chart-bar"></i>Sell</button>
+  <button class="bni" id="bn-profile" onclick="go('profile','profile')"><i class="ti ti-user"></i>Profile</button>
+</nav>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+const P = {
+  'sony-wh1000xm5':{emoji:'🎧',seller:'SoundGear Pro',trust:'9.4/10',sales:'4,200 sales',name:'Sony WH-1000XM5 Wireless Noise Cancelling Headphones',price:'$279',orig:'$349',disc:'20% off · lowest in 6 months',stars:'★★★★★',rating:'4.8 · 2,143 reviews',desc:'Buyers overwhelmingly praise the noise cancellation and battery life. Sound quality is best-in-class at this price. Minor complaints about the touch controls learning curve.',pros:['Industry-leading ANC','30h battery life','Comfortable long wear'],cons:['Touch controls fussy','No IP water rating','Bulky carry case'],ch:[32,40,36,44,38,24],chn:'Current: $279 · High: $349 · Low: $269 · <span style="color:var(--green);font-weight:600">Best time to buy</span>',raw:279,rw:'18% of buyers return this item. Most common reason: sound preference. Consider trying it in-store at Best Buy first.'},
+  'garmin-forerunner':{emoji:'⌚',seller:'FitTech Store',trust:'9.1/10',sales:'2,800 sales',name:'Garmin Forerunner 265 GPS Running Watch',price:'$349',orig:'',disc:'',stars:'★★★★★',rating:'4.7 · 876 reviews',desc:'Runners love the accuracy and battery life. AMOLED display is vibrant outdoors. A few users mention the wrist-based HR can lag during intense intervals.',pros:['Brilliant AMOLED display','13-day battery','Excellent GPS accuracy'],cons:['Wrist HR lags in sprints','No onboard music','Premium price'],ch:[38,42,40,45,43,35],chn:'Current: $349 · High: $399 · Low: $329',raw:349,rw:'9% return rate — very low for smartwatches. A confident buy.'},
+  'ipad-air':{emoji:'💻',seller:'TechDirect',trust:'9.7/10',sales:'12,400 sales',name:'Apple iPad Air 11" M2 Chip 256GB Wi-Fi',price:'$699',orig:'$749',disc:'7% off',stars:'★★★★☆',rating:'4.6 · 1,312 reviews',desc:'Praised for blazing M2 performance and the gorgeous Liquid Retina display. Most complaints are about USB-C accessories needing adapters.',pros:['M2 chip — insanely fast','Stunning Liquid Retina display','All-day battery'],cons:['Adapters needed for accessories','No headphone jack','Pricey for base storage'],ch:[46,46,44,46,42,38],chn:'Current: $699 · High: $749 · Low: $679',raw:699,rw:'6% return rate — very low. Buyers are generally delighted.'},
+  'nike-pegasus':{emoji:'👟',seller:'RunnerHub',trust:'8.9/10',sales:'8,100 sales',name:'Nike Pegasus 41 Road Running Shoes',price:'$120',orig:'$150',disc:'20% off',stars:'★★★★★',rating:'4.9 · 3,211 reviews',desc:"Nova's most-loved daily trainer. Runners praise the React foam cushioning and wide fit. A small number of narrow-foot runners find them too roomy.",pros:['Incredible cushioning','True-to-size (wide fit)','Durable outsole'],cons:['May be wide for narrow feet','Not for track workouts','Limited colourways'],ch:[45,48,44,50,46,36],chn:'Current: $120 · High: $150 · Low: $110 · <span style="color:var(--green);font-weight:600">Great deal right now</span>',raw:120,rw:'5% return rate — among the lowest in footwear.'},
+  'samsung-s24':{emoji:'📱',seller:'PhoneWorld',trust:'9.2/10',sales:'9,300 sales',name:'Samsung Galaxy S24 Ultra 256GB Titanium',price:'$1,099',orig:'$1,199',disc:'8% off',stars:'★★★★★',rating:'4.9 · 5,412 reviews',desc:'The S24 Ultra sets a new bar for Android. S Pen integration is seamless, and the 200MP camera is extraordinary. Some users mention it can get warm under heavy load.',pros:['200MP main camera','Built-in S Pen','Incredible display'],cons:['Gets warm gaming/video','Heavy at 232g','Expensive'],ch:[50,50,48,50,48,44],chn:'Current: $1,099 · High: $1,199 · Low: $1,049',raw:1099,rw:'7% return rate. Most returns are size/weight preference.'},
+  'lg-monitor':{emoji:'🖥️',seller:'MonitorHub',trust:'8.8/10',sales:'3,200 sales',name:'LG 27" 4K IPS Monitor 144Hz USB-C',price:'$449',orig:'$549',disc:'18% off',stars:'★★★★☆',rating:'4.5 · 920 reviews',desc:'Stunning colour accuracy and 144Hz smoothness. Creative pros and gamers both love it. A handful of users report minor backlight bleed in dark rooms.',pros:['Gorgeous 4K IPS panel','144Hz ultra-smooth','USB-C power delivery'],cons:['Minor edge bleed possible','Stand has limited height','No built-in speakers'],ch:[38,44,40,48,44,30],chn:'Current: $449 · High: $549 · Low: $429 · <span style="color:var(--green);font-weight:600">Near all-time low</span>',raw:449,rw:'12% return rate — some buyers expect better HDR at this price.'},
+  'tumi-backpack':{emoji:'👜',seller:'StyleVault',trust:'9.5/10',sales:'1,800 sales',name:'Tumi Alpha 3 Backpack — Navy Blue',price:'$495',orig:'$595',disc:'17% off',stars:'★★★★★',rating:'4.8 · 1,140 reviews',desc:'Business travellers consider this the gold standard carry-on backpack. FXT ballistic nylon is nearly indestructible. Some buyers wish the laptop sleeve was slightly larger.',pros:['FXT ballistic nylon','TSA-friendly laptop sleeve','Lifetime warranty'],cons:['Tight for 16" MacBook Pro','Heavy empty (1.8kg)','Premium price'],ch:[38,40,40,42,38,30],chn:'Current: $495 · High: $595 · Low: $479',raw:495,rw:'4% return rate — one of the best in bags.'},
+  'patagonia-hoodie':{emoji:'🧥',seller:'ThreadsOnly',trust:'9.3/10',sales:'4,500 sales',name:'Patagonia Down Sweater Hoody — Black',price:'$229',orig:'',disc:'',stars:'★★★★☆',rating:'4.6 · 780 reviews',desc:'The iconic lightweight down jacket. Warmth-to-weight ratio is unmatched. Buyers mention it runs slightly slim — size up if in doubt.',pros:['Incredible warmth-to-weight','Compresses to fist size','Recycled materials'],cons:['Runs slightly slim','Not windproof alone','Dry-clean recommended'],ch:[30,32,34,32,30,28],chn:'Current: $229 · Rarely discounted — fair value at full price',raw:229,rw:'10% return rate — mainly sizing. Check the fit guide.'},
+  'rayban-aviator':{emoji:'🕶️',seller:'LensLoft',trust:'9.0/10',sales:'6,200 sales',name:'Ray-Ban Classic Aviator Gold / G-15',price:'$163',orig:'$185',disc:'12% off',stars:'★★★★★',rating:'4.7 · 2,311 reviews',desc:'The timeless aviator — polarised G-15 lenses reduce glare beautifully. Fits medium to large faces best.',pros:['Iconic timeless design','Polarised G-15 lenses','Lightweight metal frame'],cons:['Can be loose on small faces','No case included','Lens scratches easily without care'],ch:[34,36,34,38,34,28],chn:'Current: $163 · High: $185 · Low: $155',raw:163,rw:'8% return rate — mainly fit/face-shape issues.'},
+  'west-elm-sofa':{emoji:'🛋️',seller:'HomeEssentials',trust:'8.6/10',sales:'920 sales',name:'West Elm Mid-Century 3-Seater Sofa — Heather Gray',price:'$1,299',orig:'$1,599',disc:'19% off',stars:'★★★★☆',rating:'4.4 · 430 reviews',desc:'Striking mid-century silhouette that photographs beautifully. Cushions are firm — most buyers appreciate this after a few weeks. Assembly takes ~2 hours.',pros:['Stunning mid-century design','Durable hardwood frame','Stain-resistant fabric'],cons:['Cushions firm at first','Assembly ~2 hours','White glove delivery needed'],ch:[50,52,50,52,48,38],chn:'Current: $1,299 · High: $1,599 · <span style="color:var(--green);font-weight:600">Lowest ever</span>',raw:1299,rw:'14% return rate for sofas is industry-standard. Colour may vary from screen.'},
+  'philips-hue':{emoji:'💡',seller:'LightHouse',trust:'9.4/10',sales:'14,200 sales',name:'Philips Hue Starter Kit — 4 White & Color Bulbs + Bridge',price:'$179',orig:'$219',disc:'18% off',stars:'★★★★★',rating:'4.8 · 6,120 reviews',desc:'The best smart lighting ecosystem. Works flawlessly with Alexa, Google, and Apple Home. Setup takes under 10 minutes.',pros:['Rock-solid app + voice control','16M colours','Works with everything'],cons:['Bridge required (included)','Expensive per extra bulb','Overkill for simple setups'],ch:[40,42,40,44,40,30],chn:'Current: $179 · High: $219 · <span style="color:var(--green);font-weight:600">Lowest in 4 months</span>',raw:179,rw:'5% return rate — buyers are overwhelmingly happy.'},
+  'monstera':{emoji:'🪴',seller:'GreenThumb',trust:'8.7/10',sales:'2,100 sales',name:'Monstera Deliciosa — Large (24" tall, 10" pot)',price:'$49',orig:'',disc:'',stars:'★★★★★',rating:'4.9 · 810 reviews',desc:"Arrives healthy and well-packaged. Nova's most gifted item in Home & Garden. Easy care — water once a week, indirect light.",pros:['Arrives healthy & full','Easy low-light care','Stunning visual statement'],cons:['Pot not included','Outgrows space quickly','Toxic to pets'],ch:[24,26,24,28,26,22],chn:'Current: $49 · Consistently priced',raw:49,rw:"3% return rate — virtually guaranteed you'll love it."},
+  'le-creuset':{emoji:'🍳',seller:'KitchenCo',trust:'9.8/10',sales:'7,800 sales',name:'Le Creuset Signature Dutch Oven 5.5qt — Flame',price:'$369',orig:'$420',disc:'12% off',stars:'★★★★★',rating:'4.9 · 3,811 reviews',desc:"Heirloom-quality cookware. Even heat distribution is unmatched. Buyers often say it's the last Dutch oven they'll ever buy.",pros:['Lifetime warranty','Unmatched heat retention','Works on all cooktops incl. induction'],cons:['Very heavy (6.4kg)','Expensive','Hand-wash recommended'],ch:[38,40,40,42,40,30],chn:'Current: $369 · High: $420 · Low: $349',raw:369,rw:'2% return rate — the lowest of any product on Nova.'},
+  'cerave':{emoji:'🧴',seller:'GlowShop',trust:'9.9/10',sales:'41,000 sales',name:'CeraVe Moisturizing Cream 19oz Tub',price:'$19',orig:'',disc:'',stars:'★★★★★',rating:'4.9 · 41,200 reviews',desc:"Nova's #1 skincare product by sales. Dermatologist-developed formula suits all skin types.",pros:['Dermatologist recommended','Fragrance-free','Restores skin barrier'],cons:['Jar can be unhygienic','Thick for oily skin in summer','Unscented (subjective)'],ch:[18,18,18,20,18,16],chn:'Current: $19 · Consistently low-priced',raw:19,rw:'1% return rate — the most universally loved product on Nova.'},
+  'charlotte-tilbury':{emoji:'💄',seller:'BeautyBox',trust:'9.3/10',sales:'2,200 sales',name:'Charlotte Tilbury Pillow Talk Lip & Cheek Gift Set',price:'$86',orig:'$110',disc:'22% off',stars:'★★★★★',rating:'4.8 · 2,240 reviews',desc:'The iconic Pillow Talk collection in one gift-ready set. Universal nudey-pink shades that flatter every skin tone.',pros:['Universal flattering shades','Luxurious packaging','Gift-ready presentation'],cons:['Lipstick transfers easily','Short-lived highlighter','Premium price per item'],ch:[42,44,44,46,42,30],chn:'Current: $86 · High: $110 · Best seasonal price',raw:86,rw:'4% return rate — mostly shade preference.'},
+  'tatcha':{emoji:'🌿',seller:'NaturalCo',trust:'9.0/10',sales:'1,500 sales',name:'Tatcha The Water Cream 50ml Oil-Free Moisturiser',price:'$68',orig:'',disc:'',stars:'★★★★☆',rating:'4.5 · 1,510 reviews',desc:'Beloved by oily and combo skin types. Feather-light texture disappears instantly. Dry skin users should layer it under a richer moisturiser.',pros:['Feather-light texture','Blurs pores visibly','Great under makeup'],cons:['Not enough for dry skin alone','Small 50ml jar','Premium price'],ch:[36,38,36,38,36,34],chn:'Current: $68 · Rarely discounted',raw:68,rw:'7% return rate — mostly skin-type mismatches.'},
+  'drunk-elephant':{emoji:'✨',seller:'GlowShop',trust:'9.1/10',sales:'890 sales',name:'Drunk Elephant C-Firma Fresh Day Serum 30ml',price:'$78',orig:'$90',disc:'13% off',stars:'★★★★★',rating:'4.7 · 891 reviews',desc:'Vitamin C serum that brightens and firms. Users see visible results in 3–4 weeks. Must be refrigerated after opening.',pros:['Visible brightening in weeks','Stable vitamin C formula','Non-irritating pH'],cons:['Requires refrigeration','Small 30ml bottle','Syringe pump takes getting used to'],ch:[44,46,44,46,42,34],chn:'Current: $78 · High: $90 · Best price in 3 months',raw:78,rw:'6% return rate — mostly scent sensitivity.'},
+  'atomic-habits':{emoji:'📚',seller:'BookNook',trust:'9.9/10',sales:'89,000 sales',name:'Atomic Habits — James Clear (Hardcover)',price:'$16',orig:'$27',disc:'41% off',stars:'★★★★★',rating:'4.9 · 89,200 reviews',desc:'The most impactful self-improvement book of the decade. Practical, science-backed, and immediately actionable.',pros:['Immediately actionable','Science-backed frameworks','Short chapters — easy to read'],cons:['Some find it basic','Repetitive in places','Not academic depth'],ch:[16,16,18,16,16,14],chn:'Current: $16 · Consistently discounted',raw:16,rw:'1% return rate — virtually universal praise.'},
+  'psychology-of-money':{emoji:'📖',seller:'BookNook',trust:'9.9/10',sales:'34,000 sales',name:'The Psychology of Money — Morgan Housel',price:'$14',orig:'$20',disc:'30% off',stars:'★★★★★',rating:'4.8 · 34,100 reviews',desc:"The best personal finance book that doesn't feel like a finance book. 19 short essays that change how you think about money, risk, and wealth.",pros:['Story-driven, not dry','Short essays — great for busy readers','Changes your money mindset'],cons:['Not a how-to investing guide','Some essays feel repetitive','Could be longer on specifics'],ch:[14,14,16,14,14,12],chn:'Current: $14 · Consistently low price',raw:14,rw:'1% return rate.'},
+  'thinking-fast-slow':{emoji:'🧠',seller:'MindReads',trust:'9.7/10',sales:'12,000 sales',name:'Thinking, Fast and Slow — Daniel Kahneman',price:'$18',orig:'$22',disc:'18% off',stars:'★★★★☆',rating:'4.6 · 12,000 reviews',desc:'Nobel Prize-winning psychology made readable. Dense but rewarding. Best for readers who enjoy deep dives into human decision-making.',pros:['Nobel Prize-level insights','Deeply researched','Changes how you think'],cons:['Dense — takes commitment','Long (500 pages)','Some examples dated'],ch:[18,18,20,18,18,16],chn:'Current: $18 · Stable pricing',raw:18,rw:'3% return rate.'},
+  'zero-to-one':{emoji:'🚀',seller:'TechBooks',trust:'9.6/10',sales:'22,000 sales',name:'Zero to One — Peter Thiel & Blake Masters',price:'$15',orig:'$18',disc:'17% off',stars:'★★★★★',rating:'4.7 · 22,100 reviews',desc:'Required reading for anyone building a startup or thinking about innovation. Contrarian, concise, and deeply thought-provoking.',pros:['Contrarian & thought-provoking','Short (200 pages)','Startup must-read'],cons:["Thiel's worldview polarises",'Not a tactical guide','Some ideas oversimplified'],ch:[14,16,14,16,14,12],chn:"Current: $15 · Rarely above $18",raw:15,rw:'2% return rate.'},
+  'bowflex-dumbbells':{emoji:'🏋️',seller:'IronHouse',trust:'9.2/10',sales:'4,200 sales',name:'Bowflex SelectTech 552 Adjustable Dumbbells (Pair)',price:'$429',orig:'$549',disc:'22% off',stars:'★★★★★',rating:'4.8 · 4,210 reviews',desc:'Replaces 15 pairs of dumbbells in one. The dial system adjusts in seconds. Buyers unanimously say it transformed their home gym.',pros:['Replaces 15 dumbbell pairs','2-second weight change','Compact footprint'],cons:['Bulky dial mechanism','Not for fast HIIT swings','Plastic can crack if dropped'],ch:[38,40,44,48,42,30],chn:'Current: $429 · High: $549 · <span style="color:var(--green);font-weight:600">Near lowest ever</span>',raw:429,rw:'5% return rate — mainly buyers who wanted fixed weights.'},
+  'manduka-mat':{emoji:'🧘',seller:'ZenGear',trust:'9.5/10',sales:'7,800 sales',name:'Manduka PRO Yoga Mat 6mm — Thunder Black',price:'$120',orig:'$140',disc:'14% off',stars:'★★★★★',rating:'4.9 · 7,800 reviews',desc:'The mat that yoga teachers buy for themselves. Extremely dense closed-cell foam — joints feel protected even in long holds. Lifetime guarantee.',pros:['Lifetime guarantee','Dense joint-protecting foam','Closed-cell surface stays clean'],cons:['Heavy (3.6kg) — not for travel','Slippery when new','Premium price'],ch:[42,44,42,44,40,32],chn:'Current: $120 · High: $140 · Good time to buy',raw:120,rw:'3% return rate — near-universal satisfaction.'},
+  'wahoo-kickr':{emoji:'🚴',seller:'CycleHub',trust:'9.0/10',sales:'1,100 sales',name:'Wahoo KICKR CORE Smart Trainer',price:'$899',orig:'$999',disc:'10% off',stars:'★★★★☆',rating:'4.6 · 1,100 reviews',desc:'The best mid-range smart trainer for Zwift and TrainerRoad. Direct-drive means no tyre wear and near-silent operation.',pros:['Near-silent direct-drive','Zwift/TrainerRoad compatible','Accurate power measurement'],cons:['Cassette sold separately','30-min setup first time','Heavy (20kg)'],ch:[46,48,46,50,46,38],chn:'Current: $899 · High: $999 · <span style="color:var(--green);font-weight:600">Lowest in 5 months</span>',raw:899,rw:'8% return rate — mostly buyers who prefer wheel-on trainers.'}
+};
+
+const CATALOG = {
+  'for-you':    ['sony-wh1000xm5','garmin-forerunner','ipad-air','nike-pegasus'],
+  'electronics':['ipad-air','sony-wh1000xm5','samsung-s24','lg-monitor'],
+  'fashion':    ['nike-pegasus','tumi-backpack','patagonia-hoodie','rayban-aviator'],
+  'home':       ['west-elm-sofa','philips-hue','monstera','le-creuset'],
+  'beauty':     ['cerave','charlotte-tilbury','tatcha','drunk-elephant'],
+  'books':      ['atomic-habits','psychology-of-money','thinking-fast-slow','zero-to-one'],
+  'fitness':    ['garmin-forerunner','bowflex-dumbbells','manduka-mat','wahoo-kickr']
+};
+
+const TITLES = {'for-you':'For you','electronics':'Electronics','fashion':'Fashion','home':'Home goods','beauty':'Beauty','books':'Books','fitness':'Fitness'};
+
+const BANNERS = {
+  'for-you':'Based on your gym &amp; audio interests — <strong>Sony WH-1000XM5</strong> and <strong>Garmin Forerunner 265</strong> are trending near Kyle, TX. Zero paid placements.',
+  'electronics':'Top electronics this week — <strong>iPad Air M2</strong> is the highest-rated tablet under $800. <strong>Samsung S24 Ultra</strong> is flying off shelves.',
+  'fashion':'Trending in fashion — <strong>Nike Pegasus 41</strong> is Nova\'s most-loved running shoe. <strong>Tumi Alpha 3</strong> is the top-reviewed travel backpack.',
+  'home':'Popular in Home — <strong>Le Creuset Dutch Oven</strong> is at its lowest price in a year. <strong>Philips Hue</strong> is the top smart-home gift this month.',
+  'beauty':'Trending in Beauty — <strong>CeraVe Moisturizing Cream</strong> is Nova\'s top-rated skincare for the 4th month running.',
+  'books':'Bestsellers this week — <strong>Atomic Habits</strong> remains Nova\'s all-time #1 book. <strong>Psychology of Money</strong> is climbing fast.',
+  'fitness':'Fitness picks — <strong>Bowflex 552</strong> is near an all-time low. <strong>Manduka PRO Mat</strong> has the highest rating in fitness this month.'
+};
+
+const TRENDING = {
+  'for-you':    [['sony-wh1000xm5','Electronics','42%'],['cerave','Beauty','28%'],['atomic-habits','Books','19%']],
+  'electronics':[['samsung-s24','Phones','51%'],['ipad-air','Tablets','38%'],['lg-monitor','Monitors','22%']],
+  'fashion':    [['nike-pegasus','Footwear','44%'],['tumi-backpack','Bags','31%'],['rayban-aviator','Accessories','18%']],
+  'home':       [['le-creuset','Kitchen','37%'],['philips-hue','Smart Home','29%'],['monstera','Plants','24%']],
+  'beauty':     [['cerave','Skincare','61%'],['charlotte-tilbury','Makeup','28%'],['drunk-elephant','Serums','22%']],
+  'books':      [['atomic-habits','Self-help','55%'],['psychology-of-money','Finance','40%'],['zero-to-one','Business','31%']],
+  'fitness':    [['garmin-forerunner','Wearables','48%'],['bowflex-dumbbells','Strength','35%'],['manduka-mat','Yoga','21%']]
+};
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Now'];
+let curP = P['sony-wh1000xm5'];
+
+// ── NAV ──────────────────────────────────────────────────────────────
+function go(pid,nid){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bni').forEach(b=>b.classList.remove('active'));
+  const pg=document.getElementById('page-'+pid);
+  if(pg)pg.classList.add('active');
+  const nb=document.getElementById('bn-'+(nid||pid));
+  if(nb)nb.classList.add('active');
+  const sc=pg&&pg.querySelector('.hb,.ddb,.ckb,.selb,.prfb,.spb,.cpb');
+  if(sc)sc.scrollTop=0;
+}
+function goHome(){go('home','home')}
+function goProduct(){go('product','home')}
+function goCheckout(){fillCheckout();go('checkout','home')}
+function goConfirm(){
+  document.getElementById('conSub').innerHTML=`${curP.name.split(' ').slice(0,4).join(' ')}… · $${(curP.raw*1.0825).toFixed(2)}<br>Arrives <strong>Thu Jun 27</strong> · Free delivery`;
+  document.getElementById('conNum').textContent='Order #NV-'+Math.floor(Math.random()*9e6+1e6);
+  go('confirm','home');
+}
+// ── COMPARE DATA ─────────────────────────────────────────────────────
+const COMPARE_ALT = {
+  'sony-wh1000xm5': {emoji:'🎵',name:'Bose QuietComfort 45',price:'$259',specs:[['ANC','Excellent'],['Battery','24h'],['Rating','4.7 ★'],['Water resist','None']],note:'Sony wins on ANC quality and battery life. Bose is $20 cheaper with simpler button controls — better if touch interfaces frustrate you. Both excel for travel and office use.'},
+  'garmin-forerunner': {emoji:'⌚',name:'Apple Watch Series 9',price:'$399',specs:[['GPS','Good'],['Battery','18h'],['Rating','4.7 ★'],['Display','OLED']],note:'Garmin wins on battery life and run-specific metrics. Apple Watch is better for general lifestyle and iPhone integration. Garmin is the serious runner\'s choice.'},
+  'ipad-air': {emoji:'📱',name:'Samsung Galaxy Tab S9',price:'$649',specs:[['Chip','Snapdragon 8 Gen 2'],['Battery','12h'],['Rating','4.5 ★'],['Display','AMOLED']],note:'iPad Air wins on app ecosystem and M2 performance. Galaxy Tab S9 has a superior AMOLED display and better multitasking on Android. Choose based on your ecosystem.'},
+  'nike-pegasus': {emoji:'👟',name:'Brooks Ghost 16',price:'$140',specs:[['Cushion','BioMoGo DNA'],['Drop','12mm'],['Rating','4.8 ★'],['Weight','279g']],note:'Nike Pegasus offers more energy return for faster paces. Brooks Ghost 16 is softer and better for long slow runs or those with joint sensitivity. Both are excellent daily trainers.'},
+  'samsung-s24': {emoji:'📱',name:'iPhone 15 Pro',price:'$999',specs:[['Camera','48MP main'],['Battery','23h'],['Rating','4.8 ★'],['Display','OLED 120Hz']],note:'Samsung S24 Ultra wins on camera versatility and the S Pen. iPhone 15 Pro wins on video quality and ecosystem. Your existing ecosystem should drive this decision.'},
+  'lg-monitor': {emoji:'🖥️',name:'Dell U2723D UltraSharp',price:'$469',specs:[['Panel','IPS Black'],['Resolution','4K'],['Rating','4.6 ★'],['Ports','USB-C 90W']],note:'LG wins on refresh rate (144Hz vs 60Hz) — ideal for gaming. Dell UltraSharp wins on colour accuracy for creative pros. Match your primary use case.'},
+  'tumi-backpack': {emoji:'👜',name:'Away The Backpack',price:'$295',specs:[['Material','Nylon'],['Laptop','Up to 16"'],['Rating','4.6 ★'],['Weight','0.9kg']],note:'Tumi wins on durability and lifetime warranty — a true long-term investment. Away is half the price and fits 16" laptops more easily. Great budget alternative.'},
+  'patagonia-hoodie': {emoji:'🧥',name:'Arc\'teryx Cerium Hoody',price:'$375',specs:[['Fill','850-power',],['Weight','295g'],['Rating','4.7 ★'],['Packable','Yes']],note:'Patagonia wins on value and sustainability. Arc\'teryx wins on technical performance and weather resistance. If you need it for alpine use, go Arc\'teryx; for everyday, Patagonia.'},
+  'rayban-aviator': {emoji:'🕶️',name:'Oakley Holbrook',price:'$188',specs:[['Lens','Prizm'],['Frame','O-Matter'],['Rating','4.8 ★'],['UV','100%']],note:'Ray-Ban wins on timeless style and versatility. Oakley wins on sports performance with superior lens technology for active use. Style preference is the key differentiator here.'},
+  'west-elm-sofa': {emoji:'🛋️',name:'Joybird Hughes Sofa',price:'$1,099',specs:[['Seat','High-density foam'],['Frame','Kiln-dried hardwood'],['Rating','4.5 ★'],['Delivery','White glove']],note:'West Elm wins on brand prestige and design versatility. Joybird is $200 cheaper with faster delivery. Both are comparable in build quality.'},
+  'philips-hue': {emoji:'💡',name:'LIFX Color A19',price:'$89',specs:[['Lumens','1100'],['Colors','16M'],['Rating','4.5 ★'],['Hub','None needed']],note:'Philips Hue wins on ecosystem reliability and features. LIFX needs no hub (saves cost) but has a smaller ecosystem. If you\'re starting fresh, Hue is worth the investment.'},
+  'monstera': {emoji:'🪴',name:'Fiddle Leaf Fig (24")',price:'$59',specs:[['Light','Bright indirect'],['Water','Weekly'],['Rating','4.6 ★'],['Pet safe','No']],note:'Monstera wins on ease of care and faster growth. Fiddle Leaf Fig is more dramatic visually but notoriously fussy. Monstera is the safer choice for most homes.'},
+  'le-creuset': {emoji:'🍳',name:'Staub Cocotte 5.5qt',price:'$330',specs:[['Weight','5.8kg'],['Finish','Black matte'],['Rating','4.8 ★'],['Warranty','Lifetime']],note:'Le Creuset wins on colour variety and brand recognition. Staub is $40 cheaper with a self-basting lid that Le Creuset lacks. Both are heirloom quality — a personal preference call.'},
+  'cerave': {emoji:'🧴',name:'Vanicream Moisturizing Cream',price:'$14',specs:[['Size','16oz'],['Fragrance','Free'],['Rating','4.8 ★'],['Dye-free','Yes']],note:'CeraVe wins on ceramide formula and dermatologist backing. Vanicream is simpler and slightly cheaper — great for ultra-sensitive skin. Both are excellent fragrance-free options.'},
+  'charlotte-tilbury': {emoji:'💄',name:'NARS Orgasm Blush Set',price:'$72',specs:[['Shades','Universal'],['Finish','Shimmer'],['Rating','4.7 ★'],['Gift ready','Yes']],note:'Charlotte Tilbury wins on packaging and the iconic Pillow Talk range. NARS Orgasm is a classic with cult-following status. Both are great gifts — Charlotte Tilbury feels more luxurious.'},
+  'tatcha': {emoji:'🌿',name:'Neutrogena Hydro Boost',price:'$22',specs:[['Key ingredient','Hyaluronic acid'],['Size','1.7oz'],['Rating','4.7 ★'],['Fragrance','Free']],note:'Tatcha wins on luxury feel and ingredient quality. Neutrogena Hydro Boost delivers similar hydration at a fraction of the price. Great budget dupe for Tatcha lovers.'},
+  'drunk-elephant': {emoji:'✨',name:'TruSkin Vitamin C Serum',price:'$20',specs:[['Vitamin C','20%'],['Size','1oz'],['Rating','4.4 ★'],['Cruelty-free','Yes']],note:'Drunk Elephant wins on stability and formulation quality. TruSkin offers a similar vitamin C serum at 75% less cost. A great starting point before committing to premium skincare.'},
+  'atomic-habits': {emoji:'📚',name:'The Power of Habit',price:'$17',specs:[['Author','Charles Duhigg'],['Pages','371'],['Rating','4.7 ★'],['Format','Hardcover']],note:'Atomic Habits is more actionable and prescriptive. The Power of Habit is stronger on the science behind why habits form. Read Atomic Habits first, then Power of Habit to go deeper.'},
+  'psychology-of-money': {emoji:'📖',name:'Rich Dad Poor Dad',price:'$12',specs:[['Author','Robert Kiyosaki'],['Pages','336'],['Rating','4.6 ★'],['Format','Paperback']],note:'Psychology of Money wins on intellectual depth and nuance. Rich Dad Poor Dad is more motivational but less nuanced. Psychology of Money is the stronger long-term read.'},
+  'thinking-fast-slow': {emoji:'🧠',name:'Predictably Irrational',price:'$16',specs:[['Author','Dan Ariely'],['Pages','304'],['Rating','4.5 ★'],['Format','Paperback']],note:'Thinking Fast & Slow is more comprehensive and rigorous. Predictably Irrational is lighter and faster to read. Start with Predictably Irrational if you\'re new to behavioural economics.'},
+  'zero-to-one': {emoji:'🚀',name:'The Lean Startup',price:'$18',specs:[['Author','Eric Ries'],['Pages','299'],['Rating','4.5 ★'],['Format','Hardcover']],note:'Zero to One is about thinking differently and building monopolies. The Lean Startup is about execution and iteration. Both are essential reads — Zero to One first, Lean Startup second.'},
+  'bowflex-dumbbells': {emoji:'🏋️',name:'PowerBlock Elite EXP',price:'$399',specs:[['Range','5–90 lbs'],['Increment','2.5 lbs'],['Rating','4.6 ★'],['Warranty','5 years']],note:'Bowflex wins on ergonomics and dial simplicity. PowerBlock is more compact and expandable. Both are excellent — choose Bowflex for ease of use, PowerBlock for space savings.'},
+  'manduka-mat': {emoji:'🧘',name:'Liforme Yoga Mat',price:'$150',specs:[['Thickness','4.2mm'],['Alignment','Printed guides'],['Rating','4.7 ★'],['Grip','Excellent wet']],note:'Manduka wins on durability and the lifetime guarantee. Liforme wins on grip (especially sweaty practices) and alignment markers. Manduka for longevity, Liforme for hot yoga.'},
+  'wahoo-kickr': {emoji:'🚴',name:'Tacx Neo 2T',price:'$1,199',specs:[['Resistance','2200W'],['Accuracy','±1%'],['Rating','4.7 ★'],['Road feel','Excellent']],note:'Wahoo KICKR Core wins on price and ecosystem. Tacx Neo 2T is $300 more but has superior road feel simulation and no calibration needed. KICKR Core is the smarter value buy.'}
+};
+
+function goCompare(){
+  const p = curP;
+  const alt = COMPARE_ALT[Object.keys(P).find(k=>P[k]===p)] || {
+    emoji:'❓', name:'Similar product', price:'–',
+    specs:[['Rating','–'],['Price','–'],['Reviews','–'],['Availability','–']],
+    note:'No comparison data available for this product yet.'
+  };
+  const curId = Object.keys(P).find(k=>P[k]===p);
+  const shortName = p.name.split(' ').slice(0,3).join(' ');
+  const altShortName = alt.name.split(' ').slice(0,3).join(' ');
+  const curSpecs = getCurSpecs(curId, p);
+  document.getElementById('compareBody').innerHTML = `
+    <button class="bk" style="margin-bottom:18px" onclick="goHome()"><i class="ti ti-arrow-left"></i>Back</button>
+    <div style="font-size:17px;font-weight:700;letter-spacing:-.4px;margin-bottom:4px">Side-by-side</div>
+    <div style="font-size:12px;color:var(--ink3);margin-bottom:16px">AI-generated · specs + reviews</div>
+    <div class="cpmg">
+      <div class="cpc win">
+        <div class="wb"><i class="ti ti-trophy" style="font-size:10px"></i>Nova's pick</div>
+        <div class="cpe">${p.emoji}</div>
+        <div class="cpn">${shortName}</div>
+        <div class="cpp">${p.price}</div>
+        ${curSpecs.map(([k,v])=>`<div class="cpa"><span>${k}</span><span>${v}</span></div>`).join('')}
+      </div>
+      <div class="cpc">
+        <div style="height:24px"></div>
+        <div class="cpe">${alt.emoji}</div>
+        <div class="cpn">${altShortName}</div>
+        <div class="cpp">${alt.price}</div>
+        ${alt.specs.map(([k,v])=>`<div class="cpa"><span>${k}</span><span>${v}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="vsd">vs</div>
+    <div class="ainote"><i class="ti ti-robot"></i><div class="ainote-t">${alt.note}</div></div>
+    <button class="btn blue" style="width:100%" onclick="goCheckout()">Buy ${shortName} · ${p.price}</button>
+    <button class="btng" style="margin-top:10px">Add more to compare</button>
+  `;
+  go('compare','home');
+}
+
+function getCurSpecs(id, p){
+  const map = {
+    'sony-wh1000xm5':[['ANC','Industry best'],['Battery','30h'],['Rating','4.8 ★'],['Water resist','None']],
+    'garmin-forerunner':[['GPS','Excellent'],['Battery','13 days'],['Rating','4.7 ★'],['Display','AMOLED']],
+    'ipad-air':[['Chip','Apple M2'],['Battery','10h'],['Rating','4.6 ★'],['Display','Liquid Retina']],
+    'nike-pegasus':[['Cushion','React foam'],['Drop','10mm'],['Rating','4.9 ★'],['Weight','283g']],
+    'samsung-s24':[['Camera','200MP main'],['Battery','45h'],['Rating','4.9 ★'],['Display','QHD+ 120Hz']],
+    'lg-monitor':[['Panel','IPS 4K'],['Refresh','144Hz'],['Rating','4.5 ★'],['Ports','USB-C 90W']],
+    'tumi-backpack':[['Material','FXT Ballistic'],['Laptop','Up to 15"'],['Rating','4.8 ★'],['Weight','1.8kg']],
+    'patagonia-hoodie':[['Fill','800-power'],['Weight','311g'],['Rating','4.6 ★'],['Packable','Yes']],
+    'rayban-aviator':[['Lens','G-15 Polarised'],['Frame','Metal'],['Rating','4.7 ★'],['UV','100%']],
+    'west-elm-sofa':[['Seat','Cushioned'],['Frame','Hardwood'],['Rating','4.4 ★'],['Delivery','White glove']],
+    'philips-hue':[['Lumens','800 each'],['Colors','16M'],['Rating','4.8 ★'],['Hub','Included']],
+    'monstera':[['Light','Indirect'],['Water','Weekly'],['Rating','4.9 ★'],['Pet safe','No']],
+    'le-creuset':[['Weight','6.4kg'],['Finish','Enamel'],['Rating','4.9 ★'],['Warranty','Lifetime']],
+    'cerave':[['Size','19oz'],['Fragrance','Free'],['Rating','4.9 ★'],['Derm rec','Yes']],
+    'charlotte-tilbury':[['Shades','Universal'],['Finish','Satin'],['Rating','4.8 ★'],['Gift ready','Yes']],
+    'tatcha':[['Key ing.','Hadasei-3™'],['Size','50ml'],['Rating','4.5 ★'],['Fragrance','Free']],
+    'drunk-elephant':[['Vitamin C','15% L-AA'],['Size','30ml'],['Rating','4.7 ★'],['Cruelty-free','Yes']],
+    'atomic-habits':[['Author','James Clear'],['Pages','320'],['Rating','4.9 ★'],['Format','Hardcover']],
+    'psychology-of-money':[['Author','Morgan Housel'],['Pages','256'],['Rating','4.8 ★'],['Format','Hardcover']],
+    'thinking-fast-slow':[['Author','D. Kahneman'],['Pages','499'],['Rating','4.6 ★'],['Format','Paperback']],
+    'zero-to-one':[['Author','Peter Thiel'],['Pages','195'],['Rating','4.7 ★'],['Format','Hardcover']],
+    'bowflex-dumbbells':[['Range','5–52.5 lbs'],['Increment','2.5 lbs'],['Rating','4.8 ★'],['Warranty','2 years']],
+    'manduka-mat':[['Thickness','6mm'],['Grip','High-density'],['Rating','4.9 ★'],['Warranty','Lifetime']],
+    'wahoo-kickr':[['Resistance','1800W'],['Accuracy','±2%'],['Rating','4.6 ★'],['Noise','Very quiet']]
+  };
+  return map[id] || [['Rating',p.rating.split('·')[0].trim()+'★'],['Price',p.price],['Seller',p.seller],['Trust',p.trust]];
+}
+
+// ── RENDER CATALOG ───────────────────────────────────────────────────
+function renderCat(cat){
+  document.getElementById('sectionTitle').textContent=TITLES[cat]||'For you';
+  document.getElementById('bannerT').innerHTML=BANNERS[cat]||BANNERS['for-you'];
+  const ids=CATALOG[cat]||CATALOG['for-you'];
+  document.getElementById('productGrid').innerHTML=ids.map(id=>{
+    const p=P[id]; if(!p)return'';
+    return`<div class="pc" onclick="openProduct('${id}')">
+      <div class="pi">${p.emoji}</div>
+      <div class="pb">
+        <div class="ps"><span class="td"></span>${p.seller}</div>
+        <div class="pn">${p.name}</div>
+        <div class="pp"><span class="pr">${p.price}</span>${p.orig?`<span class="po">${p.orig}</span>`:''}</div>
+        <div class="prat"><span class="stars">${p.stars}</span><span class="rc">${p.rating.split('·')[1]?.trim()||''}</span></div>
+        <div class="ws"><i class="ti ti-info-circle"></i>${p.why||'Personalised for you'}</div>
+      </div></div>`;
+  }).join('');
+  const tr=TRENDING[cat]||TRENDING['for-you'];
+  document.getElementById('trendingList').innerHTML=tr.map(([id,cat2,pct],i)=>{
+    const p=P[id]; if(!p)return'';
+    return`<div class="ti" onclick="openProduct('${id}')">
+      <span class="tn">${i+1}</span>
+      <div class="te">${p.emoji}</div>
+      <div class="ti-info"><div class="ti-name">${p.name.split(' ').slice(0,4).join(' ')}</div><div class="ti-meta">${cat2} · <span class="tb">↑ ${pct}</span></div></div>
+      <div class="tprice">${p.price}</div></div>`;
+  }).join('');
+}
+
+// ── OPEN PRODUCT ─────────────────────────────────────────────────────
+function openProduct(id){
+  const p=P[id]; if(!p)return;
+  curP=p;
+  // Hero
+  const hero=document.getElementById('detailHero');
+  let sp=hero.querySelector('.he');
+  if(!sp){sp=document.createElement('span');sp.className='he';sp.style.cssText='position:relative;z-index:1;font-size:100px';hero.appendChild(sp);}
+  sp.textContent=p.emoji;
+  // Fields
+  document.getElementById('dTrust').innerHTML=`<i class="ti ti-shield-check" style="font-size:11px"></i>Trust ${p.trust}`;
+  document.getElementById('dSeller').textContent=`by ${p.seller} · ${p.sales}`;
+  document.getElementById('dName').textContent=p.name;
+  document.getElementById('dStars').textContent=p.stars;
+  document.getElementById('dRating').textContent=p.rating;
+  document.getElementById('dPrice').textContent=p.price;
+  document.getElementById('dOrig').textContent=p.orig||'';
+  const de=document.getElementById('dDiscount');
+  de.innerHTML=p.disc||''; de.style.display=p.disc?'':'none';
+  document.getElementById('dBuyBtn').textContent=`Buy now · ${p.price}`;
+  document.getElementById('dDesc').textContent=p.desc;
+  document.getElementById('dPros').innerHTML=p.pros.map(t=>`<div class="pci pro"><i class="ti ti-check"></i>${t}</div>`).join('');
+  document.getElementById('dCons').innerHTML=p.cons.map(t=>`<div class="pci con"><i class="ti ti-x"></i>${t}</div>`).join('');
+  // Chart
+  document.getElementById('dChart').innerHTML=p.ch.map((h,i)=>
+    `<div class="phcol"><div class="phbar${i===5?' now':''}" style="height:${h}px"></div><div class="phmo">${MONTHS[i]}</div></div>`
+  ).join('');
+  document.getElementById('dChartNote').innerHTML=p.chn;
+  go('product','home');
+}
+
+// ── CHECKOUT ─────────────────────────────────────────────────────────
+function fillCheckout(){
+  const p=curP,tax=p.raw*.0825,total=p.raw+tax;
+  document.getElementById('ckItemN').textContent=p.name.split(' ').slice(0,5).join(' ')+'…';
+  document.getElementById('ckItemP').textContent=p.price;
+  document.getElementById('ckTax').textContent='$'+tax.toFixed(2);
+  document.getElementById('ckTotal').textContent='$'+total.toFixed(2);
+  document.getElementById('ckBtn').textContent=`Place order · $${total.toFixed(2)}`;
+  document.getElementById('ckWarn').innerHTML=`<strong>Heads up:</strong> ${p.rw}`;
+}
+function selPay(t){
+  document.querySelectorAll('.popt').forEach(e=>e.classList.remove('sel'));
+  const el=document.getElementById('pay-'+t);if(el)el.classList.add('sel');
+}
+
+// ── CATEGORY PILLS ───────────────────────────────────────────────────
+document.querySelectorAll('.cp').forEach(pill=>{
+  pill.addEventListener('click',function(){
+    document.querySelectorAll('.cp').forEach(p=>p.classList.remove('active'));
+    this.classList.add('active');
+    renderCat(this.dataset.cat);
+  });
+});
+
+// ── SEARCH SHORTCUT ──────────────────────────────────────────────────
+function filterAndGo(cat){
+  goHome();
+  document.querySelectorAll('.cp').forEach(p=>p.classList.remove('active'));
+  const pill=document.querySelector(`.cp[data-cat="${cat}"]`);
+  if(pill)pill.classList.add('active');
+  renderCat(cat);
+}
+document.getElementById('homeSearch').addEventListener('keydown',function(e){
+  if(e.key==='Enter')go('search','search');
+});
+
+// ── CHAT ─────────────────────────────────────────────────────────────
+function addMsg(text){
+  const m=document.getElementById('chatMsgs');
+  const b=document.createElement('div');b.className='bub m';b.textContent=text;m.appendChild(b);m.scrollTop=m.scrollHeight;
+  setTimeout(()=>{
+    const r=document.createElement('div');r.className='bub b';
+    r.innerHTML="Great question! Searching Nova's catalog, filtering by reviews, price, and your interests…";
+    m.appendChild(r);m.scrollTop=m.scrollHeight;
+  },650);
+}
+function sendChat(){const i=document.getElementById('chatInput');if(i.value.trim()){addMsg(i.value.trim());i.value='';}}
+document.getElementById('chatInput').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}});
+
+// ── INIT ─────────────────────────────────────────────────────────────
+// Add "why" fields to products that need them
+const whys={'sony-wh1000xm5':'gym + audio interest','garmin-forerunner':'Trending near you','ipad-air':'You viewed similar tablets','nike-pegasus':'Fitness interest','samsung-s24':'Top rated in Electronics','lg-monitor':'Highly reviewed','tumi-backpack':'Editor pick','patagonia-hoodie':'Trending now','rayban-aviator':'Bestseller','west-elm-sofa':'Trending in Home','philips-hue':'Smart home pick','monstera':'Most gifted in Home','le-creuset':'Classic buy','cerave':'#1 in Skincare','charlotte-tilbury':'Trending gift','tatcha':'Editor pick','drunk-elephant':'Highly rated','atomic-habits':'All-time bestseller','psychology-of-money':'Top Finance pick','thinking-fast-slow':'Classic read','zero-to-one':'Startup must-read','bowflex-dumbbells':'Home gym essential','manduka-mat':'Top rated mat','wahoo-kickr':'Best smart trainer'};
+Object.entries(whys).forEach(([id,w])=>{if(P[id])P[id].why=w;});
+renderCat('for-you');
+</script>
+</body>
+</html>
